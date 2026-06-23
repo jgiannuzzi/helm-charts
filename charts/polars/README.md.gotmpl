@@ -323,6 +323,54 @@ anonymousResults:
 
 If you wish to disable anonymous results, keep `anonymousResults.*.enabled: false`. This will ensure that all query result output locations need to be explicitly set by users.
 
+#### Custom filesystem paths (e.g. NFS)
+
+For anonymous results and shuffle data, you can point Polars at a custom filesystem path instead of using S3 or ephemeral volumes. This is intended for shared network filesystems such as NFS or CephFS, where all pods can access the same data through a common mount point. First, add the NFS volume and mount it into the container via the `volumes` and `volumeMounts` values, then set the `customPath` to tell Polars to use that mount point.
+
+> **Note:** Custom filesystem paths are designed for shared network filesystems. For shuffle data in particular, all workers must be able to read and write to the same path — the `shared_filesystem` shuffle location is used under the hood.
+
+Example using NFS for shuffle data:
+
+```yaml
+shuffleData:
+  customPath:
+    enabled: true
+    path: "/mnt/nfs/shuffle-data"
+
+worker:
+  deployment:
+    volumes:
+      - name: nfs-shuffle
+        nfs:
+          server: nfs-server.example.com
+          path: /exports/shuffle-data
+    runtimeContainer:
+      volumeMounts:
+        - name: nfs-shuffle
+          mountPath: /mnt/nfs/shuffle-data
+```
+
+Example using NFS for anonymous results:
+
+```yaml
+anonymousResults:
+  customPath:
+    enabled: true
+    path: "/mnt/nfs/anonymous-results"
+
+scheduler:
+  deployment:
+    volumes:
+      - name: nfs-results
+        nfs:
+          server: nfs-server.example.com
+          path: /exports/anonymous-results
+    runtimeContainer:
+      volumeMounts:
+        - name: nfs-results
+          mountPath: /mnt/nfs/anonymous-results
+```
+
 #### Temporary data
 
 Polars itself uses some temporary storage location in the streaming engine and in some cases when downloading remote files. For most queries this is a relatively small volume and is not performance sensitive. By default, the persistent volume for this is disabled, and an `emptyDir` volume is used instead. However, to prevent the host from running out of disk space during large queries, it is recommended to enable a persistent volume for this purpose. The feature below will add a [Generic Ephemeral Volume](https://kubernetes.io/docs/concepts/storage/ephemeral-volumes/) to each of the pods.

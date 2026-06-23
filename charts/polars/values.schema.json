@@ -22707,6 +22707,26 @@
           "required": [],
           "title": "abs"
         },
+        "customPath": {
+          "additionalProperties": false,
+          "description": "Configure a custom filesystem path for anonymous results (e.g. an NFS mount). You must mount the volume yourself using scheduler.deployment.volumes and scheduler.deployment.runtimeContainer.volumeMounts.",
+          "properties": {
+            "enabled": {
+              "default": "false",
+              "description": "Enable custom path for anonymous results.",
+              "required": [],
+              "title": "enabled"
+            },
+            "path": {
+              "default": "/mnt/nfs/anonymous-results",
+              "description": "The filesystem path where anonymous results will be stored. Must correspond to a mounted volume.",
+              "required": [],
+              "title": "path"
+            }
+          },
+          "required": [],
+          "title": "customPath"
+        },
         "gcs": {
           "additionalProperties": false,
           "description": "Configure Google Cloud Storage as anonymous results location.",
@@ -23655,6 +23675,26 @@
           },
           "required": [],
           "title": "abs"
+        },
+        "customPath": {
+          "additionalProperties": false,
+          "description": "Configure a custom filesystem path for shuffle data (e.g. an NFS mount). Intended for shared network filesystems where all workers access the same path. You must mount the volume yourself using worker.deployment.volumes and worker.deployment.runtimeContainer.volumeMounts.",
+          "properties": {
+            "enabled": {
+              "default": "false",
+              "description": "Enable custom path for shuffle data.",
+              "required": [],
+              "title": "enabled"
+            },
+            "path": {
+              "default": "/mnt/nfs/shuffle-data",
+              "description": "The filesystem path where shuffle data will be stored. Must correspond to a mounted volume on a shared network filesystem.",
+              "required": [],
+              "title": "path"
+            }
+          },
+          "required": [],
+          "title": "customPath"
         },
         "ephemeralVolumeClaim": {
           "additionalProperties": false,
